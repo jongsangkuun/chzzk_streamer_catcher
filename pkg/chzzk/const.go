@@ -2,8 +2,12 @@ package chzzk
 
 import "fmt"
 
-const BaseURL = "https://openapi.chzzk.naver.com/"
+const (
+	BaseURL         = "https://openapi.chzzk.naver.com/open"
+	ChannelVersion  = "v1"
+	CategoryVersion = "v1"
+)
 
-var ChannelUrl = fmt.Sprintf("%s/open/v1/channels", BaseURL)
+var ChannelUrl = fmt.Sprintf("%s/%s/channels", BaseURL, ChannelVersion)
 
-var CategoriyUrl = fmt.Sprintf("%s/open/v1/categories", BaseURL)
+var CategoryUrl = fmt.Sprintf("%s/%s/categories", BaseURL, CategoryVersion)
