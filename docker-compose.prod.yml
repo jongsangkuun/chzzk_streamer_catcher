@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      target: prod
+    environment:
+      DEBUG: ${PROD_DEBUG}
+      POSTGRES_USER: ${PROD_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PROD_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PROD_POSTGRES_DB}
+    networks:
+      - chzzk_streamer_catcher
+
+  postgresql-db:
+    environment:
+      DEBUG: ${PROD_DEBUG}
+      POSTGRES_USER: ${PROD_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PROD_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PROD_POSTGRES_DB}

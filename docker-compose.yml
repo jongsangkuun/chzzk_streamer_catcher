@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+    environment:
+      CHZZK_CLIENT_ID: ${CHZZK_CLIENT_ID}
+      CHZZK_SECRET_ID: ${CHZZK_SECRET_ID}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    networks:
+      - chzzk_streamer_catcher
+
+  postgresql-db:
+    container_name: postgresql-db
+    image: postgres:16-alpine
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    networks:
+      - chzzk_streamer_catcher
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+networks:
+  chzzk_streamer_catcher:
+
+volumes:
+  postgresql-data:

@@ -29,11 +29,11 @@ func ParseEnv() (Env, error) {
 		field    *string
 		required bool
 	}{
-		"PSQL_HOST":     {&env.PsqlHost, true},
-		"PSQL_PORT":     {&env.PsqlPort, true},
-		"PSQL_USER":     {&env.PsqlUser, true},
-		"PSQL_PASSWORD": {&env.PsqlPassword, true},
-		"PSQL_DB":       {&env.PsqlDb, true},
+		"POSTGRES_HOST":     {&env.PsqlHost, true},
+		"POSTGRES_PORT":     {&env.PsqlPort, true},
+		"POSTGRES_USER":     {&env.PsqlUser, true},
+		"POSTGRES_PASSWORD": {&env.PsqlPassword, true},
+		"POSTGRES_DB":       {&env.PsqlDb, true},
 
 		"CHZZK_CLIENT_ID": {&env.ChzzkClientId, true},
 		"CHZZK_SECRET_ID": {&env.ChzzkSecretId, true},
