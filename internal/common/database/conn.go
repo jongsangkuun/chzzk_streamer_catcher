@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	costomLogger "github.com/jongsangkuun/chzzk_streamer_catcher/internal/log"
-	"log"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -12,6 +11,8 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// Todo
+// Gorm vs Sqlx 선택 고민
 type Config struct {
 	Host         string
 	Port         int
