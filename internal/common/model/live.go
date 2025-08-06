@@ -24,8 +24,6 @@ type LiveDataDB struct {
 	ChannelID           string
 	ChannelName         string
 	ChannelImageURL     string
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
 }
 
 type LiveDataDBList []*LiveDataDB
@@ -53,43 +51,6 @@ func (t *Tags) Scan(value interface{}) error {
 	return json.Unmarshal(bytes, t)
 }
 
-func (liveDataDB *LiveDataDB) Insert(db *sql.DB) error {
-	query := `
-		INSERT INTO live_data (
-			live_id, live_title, concurrent_user_count, open_date, adult, 
-			tags, category_type, live_category, live_category_value, 
-			channel_id, channel_name, channel_image_url, created_at, updated_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`
-
-	tagsJSON, err := liveDataDB.Tags.Value()
-	if err != nil {
-		return fmt.Errorf("failed to marshal tags: %w", err)
-	}
-
-	_, err = db.Exec(query,
-		liveDataDB.LiveID,
-		liveDataDB.LiveTitle,
-		liveDataDB.ConcurrentUserCount,
-		liveDataDB.OpenDate,
-		liveDataDB.Adult,
-		tagsJSON,
-		liveDataDB.CategoryType,
-		liveDataDB.LiveCategory,
-		liveDataDB.LiveCategoryValue,
-		liveDataDB.ChannelID,
-		liveDataDB.ChannelName,
-		liveDataDB.ChannelImageURL,
-		liveDataDB.CreatedAt,
-		liveDataDB.UpdatedAt,
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to insert live data: %w", err)
-	}
-
-	return nil
-}
-
 // BulkInsert 여러 개의 LiveDataDB를 한 번에 삽입하는 메서드
 func BulkInsert(db *sql.DB, liveDataList LiveDataDBList) error {
 	if len(liveDataList) == 0 {
@@ -102,10 +63,10 @@ func BulkInsert(db *sql.DB, liveDataList LiveDataDBList) error {
 
 	for i, liveData := range liveDataList {
 		// 각 레코드마다 ($1, $2, ..., $14) 형태로 placeholders 생성
-		start := i * 14
-		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+		start := i * 12
+		valueStrings = append(valueStrings, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
 			start+1, start+2, start+3, start+4, start+5, start+6, start+7,
-			start+8, start+9, start+10, start+11, start+12, start+13, start+14))
+			start+8, start+9, start+10, start+11, start+12))
 
 		// Tags를 JSON으로 변환
 		tagsJSON, err := liveData.Tags.Value()
@@ -127,8 +88,6 @@ func BulkInsert(db *sql.DB, liveDataList LiveDataDBList) error {
 			liveData.ChannelID,
 			liveData.ChannelName,
 			liveData.ChannelImageURL,
-			liveData.CreatedAt,
-			liveData.UpdatedAt,
 		)
 	}
 
@@ -137,7 +96,7 @@ func BulkInsert(db *sql.DB, liveDataList LiveDataDBList) error {
 		INSERT INTO live_data (
 			live_id, live_title, concurrent_user_count, open_date, adult, 
 			tags, category_type, live_category, live_category_value, 
-			channel_id, channel_name, channel_image_url, created_at, updated_at
+			channel_id, channel_name, channel_image_url
 		) VALUES %s`, strings.Join(valueStrings, ","))
 
 	_, err := db.Exec(query, valueArgs...)
