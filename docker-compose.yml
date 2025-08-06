@@ -9,12 +9,19 @@ services:
       CHZZK_SECRET_ID: ${CHZZK_SECRET_ID}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
+      TIMEZONE: ${TIMEZONE}
+    depends_on:
+      postgresql-db:
+        condition: service_healthy
     networks:
       - chzzk_streamer_catcher
 
   postgresql-db:
     container_name: postgresql-db
     image: postgres:16-alpine
+    environment:
+      TZ: UTC  # PostgreSQL 컨테이너 타임존을 UTC로 설정
+      PGTZ: UTC  # PostgreSQL 서버 타임존을 UTC로 설정
     volumes:
       - postgresql-data:/var/lib/postgresql/data/
     ports:

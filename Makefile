@@ -50,6 +50,19 @@ else
 	exit 1
 endif
 
+# 환경 변수 검증
+env-check:
+	@echo "환경 변수 확인 중..."
+	@if [ ! -f .env ]; then echo "Error: .env 파일이 없습니다."; exit 1; fi
+	@echo ".env 파일이 존재합니다."
+	@docker-compose config > /dev/null && echo "Docker Compose 설정이 유효합니다." || echo "Docker Compose 설정에 문제가 있습니다."
+
+# 개발 환경 빠른 시작
+dev-start: env-check
+	ENV=dev make service-build
+	ENV=dev make service-up
+	@echo "개발 환경이 시작되었습니다."
+
 # 개별 앱 컨테이너 제어
 app-up:
 	docker start $(PROJECT_NAME)-app-1 || docker start $(PROJECT_NAME)_app_1
