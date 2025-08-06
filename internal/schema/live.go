@@ -1,6 +1,10 @@
 package schema
 
-import "time"
+import (
+	"fmt"
+	"github.com/jongsangkuun/chzzk_streamer_catcher/internal/common/model"
+	"time"
+)
 
 // ChzzkAPIResponse 치지직 API 공통 응답 구조체
 type ChzzkAPIResponse struct {
@@ -32,6 +36,8 @@ type LiveData struct {
 	ChannelImageURL       string   `json:"channelImageUrl"`
 }
 
+type LiveDataList []LiveData
+
 // PageInfo 페이징 정보
 type PageInfo struct {
 	Next string `json:"next"`
@@ -50,4 +56,38 @@ func (l *LiveData) IsAdultContent() bool {
 // HasTags 태그가 있는지 확인
 func (l *LiveData) HasTags() bool {
 	return len(l.Tags) > 0
+}
+
+func (l *LiveData) ConvertLiveDataToLiveDataDB() (model.LiveDataDB, error) {
+	openDate, err := l.GetOpenDateTime()
+	if err != nil {
+		return model.LiveDataDB{}, fmt.Errorf("failed to parse open date: %w", err)
+	}
+
+	return model.LiveDataDB{
+		LiveID:              l.LiveID,
+		LiveTitle:           l.LiveTitle,
+		ConcurrentUserCount: l.ConcurrentUserCount,
+		OpenDate:            openDate,
+		Adult:               l.Adult,
+		Tags:                model.Tags(l.Tags),
+		CategoryType:        l.CategoryType,
+		LiveCategory:        l.LiveCategory,
+		LiveCategoryValue:   l.LiveCategoryValue,
+		ChannelID:           l.ChannelID,
+		ChannelName:         l.ChannelName,
+		ChannelImageURL:     l.ChannelImageURL,
+	}, nil
+}
+
+func ConvertLiveListToLiveDataDBList(liveDataList LiveDataList) (model.LiveDataDBList, error) {
+	var liveDataDBList model.LiveDataDBList
+	for _, liveData := range liveDataList {
+		liveDataDB, err := liveData.ConvertLiveDataToLiveDataDB()
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert live data: %w", err)
+		}
+		liveDataDBList = append(liveDataDBList, &liveDataDB)
+	}
+	return liveDataDBList, nil
 }
