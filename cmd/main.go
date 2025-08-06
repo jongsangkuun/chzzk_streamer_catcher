@@ -1,71 +1,38 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"net/url"
+	"github.com/jongsangkuun/chzzk_streamer_catcher/internal/common/conf"
+	customLogger "github.com/jongsangkuun/chzzk_streamer_catcher/internal/log"
+	"github.com/jongsangkuun/chzzk_streamer_catcher/pkg/service"
+	"time"
 )
 
+// Todo
+// 수집 데이터 Postgres Bulk Insert로 수집 기능 추가
+// 리펙토링 필수....
 func main() {
-	clientID := ""
-	clientSecret := ""
+	customLogger.Init()
 
-	baseURL := "https://openapi.chzzk.naver.com/open/v1/channels"
-
-	// 조회할 채널 ID 목록 (최대 20개)
-	channelIDs := []string{"c847a58a1599988f6154446c75366523"}
-
-	// 쿼리 파라미터 세팅
-	u, err := url.Parse(baseURL)
+	envConfig, err := conf.ParseEnv()
 	if err != nil {
-		log.Fatalf("Failed to parse URL: %v", err)
+		customLogger.Fatal("Failed to parse environment variables: ", err)
 	}
 
-	query := url.Values{}
-	for _, id := range channelIDs {
-		query.Add("channelIds", id)
-	}
-	u.RawQuery = query.Encode()
-
-	req, err := http.NewRequest("GET", u.String(), nil)
+	dbConn, err := conf.ConnectPostgreSQL(envConfig)
 	if err != nil {
-		log.Fatalf("Failed to create request: %v", err)
+		customLogger.Fatal("Failed to connect to PostgreSQL: ", err)
 	}
+	defer conf.CloseConnection()
 
-	// 헤더 세팅
-	req.Header.Set("Client-Id", clientID)
-	req.Header.Set("Client-Secret", clientSecret)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	err = conf.InitializeDatabase(dbConn)
 	if err != nil {
-		log.Fatalf("Request failed: %v", err)
+		customLogger.Fatal("Failed to initialize database: ", err)
 	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Failed to read response: %v", err)
-	}
-
-	fmt.Printf("Status: %s\n", resp.Status)
-
-	// JSON을 예쁘게 포맷해서 출력
-	var jsonData interface{}
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		// JSON 파싱에 실패하면 원본 텍스트로 출력
-		fmt.Printf("Response (raw):\n%s\n", string(body))
-	} else {
-		// JSON을 예쁘게 포맷해서 출력
-		prettyJSON, err := json.MarshalIndent(jsonData, "", "  ")
+	for {
+		_, err = service.CatcherService(envConfig, dbConn)
 		if err != nil {
-			fmt.Printf("Response (raw):\n%s\n", string(body))
-		} else {
-			fmt.Printf("Response (formatted):\n%s\n", string(prettyJSON))
+			customLogger.Fatal("Failed to catch live list: ", err)
 		}
+		time.Sleep(300 * time.Second)
 	}
-
 }

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      target: dev
+    environment:
+      DEBUG: ${DEV_DEBUG}
+      POSTGRES_USER: ${DEV_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DEV_POSTGRES_DB}
+      POSTGRES_MAX_OPEN_CONNS: ${DEV_POSTGRES_MAX_OPEN_CONNS}
+      POSTGRES_MAX_IDLE_CONNS: ${DEV_POSTGRES_MAX_IDLE_CONNS}
+      POSTGRES_CONN_MAX_LIFETIME: ${DEV_POSTGRES_CONN_MAX_LIFETIME}
+      POSTGRES_CONN_MAX_IDLE_TIME: ${DEV_POSTGRES_CONN_MAX_IDLE_TIME}
+      SSL_MODE: ${DEV_SSL_MODE}
+    volumes:
+      - .:/app:cached  # 개발 시 실시간 코드 변경 반영
+    networks:
+      - chzzk_streamer_catcher
+
+  postgresql-db:
+    environment:
+      DEBUG: ${DEV_DEBUG}
+      POSTGRES_USER: ${DEV_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DEV_POSTGRES_DB}

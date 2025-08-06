@@ -1,4 +1,4 @@
-package common
+package conf
 
 import (
 	"fmt"
@@ -12,6 +12,14 @@ type Env struct {
 	PsqlUser     string
 	PsqlPassword string
 	PsqlDb       string
+
+	SSLMode  string
+	Timezone string
+
+	PsqlMaxOpenConns    string
+	PsqlMaxIdleConns    string
+	PsqlConnMaxLifetime string
+	PsqlConnMaxIdleTime string
 
 	ChzzkClientId string
 	ChzzkSecretId string
@@ -29,11 +37,18 @@ func ParseEnv() (Env, error) {
 		field    *string
 		required bool
 	}{
-		"PSQL_HOST":     {&env.PsqlHost, true},
-		"PSQL_PORT":     {&env.PsqlPort, true},
-		"PSQL_USER":     {&env.PsqlUser, true},
-		"PSQL_PASSWORD": {&env.PsqlPassword, true},
-		"PSQL_DB":       {&env.PsqlDb, true},
+		"POSTGRES_HOST":     {&env.PsqlHost, true},
+		"POSTGRES_PORT":     {&env.PsqlPort, true},
+		"POSTGRES_USER":     {&env.PsqlUser, true},
+		"POSTGRES_PASSWORD": {&env.PsqlPassword, true},
+		"POSTGRES_DB":       {&env.PsqlDb, true},
+
+		"SSL_MODE":                    {&env.SSLMode, false},
+		"TIMEZONE":                    {&env.Timezone, false},
+		"POSTGRES_MAX_OPEN_CONNS":     {&env.PsqlMaxOpenConns, true},
+		"POSTGRES_MAX_IDLE_CONNS":     {&env.PsqlMaxIdleConns, true},
+		"POSTGRES_CONN_MAX_LIFETIME":  {&env.PsqlConnMaxLifetime, true},
+		"POSTGRES_CONN_MAX_IDLE_TIME": {&env.PsqlConnMaxIdleTime, true},
 
 		"CHZZK_CLIENT_ID": {&env.ChzzkClientId, true},
 		"CHZZK_SECRET_ID": {&env.ChzzkSecretId, true},
