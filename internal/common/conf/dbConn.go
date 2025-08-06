@@ -3,12 +3,13 @@ package conf
 import (
 	"database/sql"
 	"fmt"
-	customLogger "github.com/jongsangkuun/chzzk_streamer_catcher/internal/log"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	customLogger "github.com/jongsangkuun/chzzk_streamer_catcher/internal/log"
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 )
@@ -143,30 +144,6 @@ func GetConnectionStats() map[string]interface{} {
 		"max_idle_time_closed": stats.MaxIdleTimeClosed,
 		"max_lifetime_closed":  stats.MaxLifetimeClosed,
 	}
-}
-
-// 트랜잭션 시작
-func BeginTx() (*sql.Tx, error) {
-	if DB == nil {
-		return nil, fmt.Errorf("데이터베이스 연결이 없습니다")
-	}
-	return DB.Begin()
-}
-
-// 헬스 체크
-func HealthCheck() error {
-	if DB == nil {
-		return fmt.Errorf("데이터베이스 연결이 없습니다")
-	}
-	return DB.Ping()
-}
-
-// Prepared Statement 생성 헬퍼
-func PrepareStmt(query string) (*sql.Stmt, error) {
-	if DB == nil {
-		return nil, fmt.Errorf("데이터베이스 연결이 없습니다")
-	}
-	return DB.Prepare(query)
 }
 
 // InitializeDatabase SQL 파일을 사용하여 데이터베이스를 초기화
