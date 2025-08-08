@@ -22,7 +22,7 @@ func Init() {
 	Logger.SetLevel(logrus.InfoLevel)
 
 	// 호출자 정보 추가
-	Logger.SetReportCaller(true)
+	//Logger.SetReportCaller(true)
 }
 
 // 편의성을 위한 래퍼 함수들
