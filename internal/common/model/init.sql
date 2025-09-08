@@ -17,6 +17,22 @@ CREATE TABLE IF NOT EXISTS live_data (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
                             );
 
+-- update 발생 시 updated_at 갱신
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON live_data
+    FOR EACH ROW
+    EXECUTE FUNCTION trigger_set_timestamp();
+
+
+
 -- 인덱스 생성
 CREATE INDEX IF NOT EXISTS idx_live_data_live_id ON live_data(live_id);
 CREATE INDEX IF NOT EXISTS idx_live_data_channel_id ON live_data(channel_id);
